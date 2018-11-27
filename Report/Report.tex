@@ -420,12 +420,9 @@ The abstract goes here.
 \IEEEPARstart{T}{his} 
 
 \subsection{Semantic Segmentation}
-
 Semantic means "meaning in language or logic", and when we talk about 
 semnatically segmenting an image we mean to divide the image in to meaningful
-parts, such as physical objects. For example, the 
-Figure~\ref{fig:semantic_segmentation} has been segmented into 4 different 
-categories (Cat, Table, Chair, and Background).
+parts, such as physical objects.
 
 \begin{figure}[!h]
     \includegraphics[width=\linewidth]{cat-semantic-segmentation.png}
@@ -433,27 +430,50 @@ categories (Cat, Table, Chair, and Background).
     \label{fig:semantic_segmentation}
 \end{figure}
 
-As it might be evident, this task is not achievable using unsupervised
-methods. We need to define the desired segmentation categories, as an image 
-with infinte detail could be segmented into an infinite number of categories.
+For example, the Figure~\ref{fig:semantic_segmentation} has been segmented 
+into 4 different categories (Cat, Table, Chair, and Background). As it might 
+be evident, this task is not achievable using unsupervised methods. We need to 
+define the desired segmentation categories, as an image with infinte detail 
+could be segmented into an infinite number of categories.
+
 
 
 \section{}
 
-\subsection{Fully Connected Networks}
+\subsection{Fully Convolutional Networks}
+Fully Convolutional Networks (FCNs) are what one gets on building a neural 
+network using only convolutional-type layers. They keep the spatial information 
+of an image intact.
+
+\begin{figure}[!h]
+    \includegraphics[width=\linewidth]{fcn.png}
+    \caption{Representation of a FCN (Source: J. Long et al, 2015\cite{long2015fully})}
+    \label{fig:fully-convolutional-network}
+\end{figure}
+
 
 \subsection{Deconvolution Networks}
+Pooling layers decrease the dimensions of an image. To scale it back up to its 
+original size, instead of using Bilinear techniques, we have used Deconvolution 
+layers. Deconvolution layers act as reverse convolution layers, and serve the 
+purose of scaling up an image. Like there counterparts, they too are learnable.
+
+\begin{figure}[!h]
+  \includegraphics[width=\linewidth]{deconvolution.png}
+  \caption{Representation of a Deconvolution Network (Source: H Noh et al, 2015\cite{noh2015learning})}
+  \label{fig:deconvolution-network}
+\end{figure}
+
 
 
 \section{Data Used}
 
 \subsection{Cityscapes}
-
-The Cityscapes Dataset offers pixel-wise segmented images from stereo videos 
-recorded in street scenes from 50 different cities. It contains 5,000 fine 
-quality and a larger set of 20,000 weakly annotated images. The images have 
-a resolution of 2048 x 1024 pixels. For our purpose, we use the set of finely 
-annotated images from the left cam-era.
+The Cityscapes dataset\cite{Cordts2016Cityscapes} offers pixel-wise segmented 
+images from stereo videos recorded in street scenes from 50 different cities. 
+It contains 5,000 fine quality and a larger set of 20,000 weakly annotated 
+images. The images have a resolution of 2048 x 1024 pixels. For our purpose, 
+we use the set of finely annotated images from the left cam-era.
 
 \begin{figure}[!h]
   \includegraphics[width=\linewidth]{zuerich.png}
@@ -461,13 +481,40 @@ annotated images from the left cam-era.
   \label{fig:cityscapes_dataset}
 \end{figure}
 
+
 \subsection{Stanford Scene Understanding Dataset}
 
-The dataset contains a total of 534 images (400 training and 134 test), with 
-labels comprising of 9 classes (un-known, sky, tree/bush, road/path, grass, 
-water, building, mountain, foreground object). Resolution of the images is 
-240 x 320 pixels. This served as a testing dataset to check for convergence of 
-our models.
+The Stanford Scene Understanding dataset\cite{liu2010single}, 
+\cite{saxena2006learning}, \cite{saxena2009make3d} contains a total of 534 
+images (400 training and 134 test), with labels comprising of 9 classes 
+(unknown, sky, tree/bush, road/path, grass, water, building, mountain, 
+foreground object). Resolution of the images is 240 x 320 pixels. This served 
+as a testing dataset to check for convergence of our models.
+
+
+
+\section{Segmentation Architecture}
+
+We use a hybrid architecture of a Fully Convolutional Network, a 
+Deconvolution Network, and skip connections.
+
+
+\subsection{Skip Connections}
+With increasing network depths, vanishing gradients cause the accuracy to 
+decrease rapidly. Deeper networks also have slower training, as gradient changes 
+become minute.
+
+Skip connections solve these problems by joining the output of an earlier layer 
+to a later one, skipping all those in between. These shortcut connections help 
+in keeping the effect of gradients intact during backpropagation.
+
+When using pooling layers, information gets lost at each step. This limits the
+network's ability to resize the image back to its original size. Skip 
+connections help pass the high resolution information to later layers.
+
+
+\subsection{Architecture}
+
 
 
 
@@ -569,8 +616,7 @@ our models.
 
 
 
-\section{Conclusion}
-The conclusion goes here.
+\section{Results}
 
 
 
@@ -589,27 +635,24 @@ The conclusion goes here.
 % \subsection or using \label (\appendices by itself
 % starts a section numbered zero.)
 %
-
+\clearpage
 
 \appendices
-\section{Proof of the First Zonklar Equation}
-Appendix one text goes here.
+\section{Model Architecture - Cityscapes Dataset}
 
-% you can choose not to have a title for an appendix
-% if you want by leaving the argument blank
-\section{}
-Appendix two text goes here.
+\begin{figure}[!hp]
+    \includegraphics[height=0.9\textheight]{cityscapes-model.png}
+    \caption{Model Architecture - Cityscapes Dataset}
+    \label{fig:cityscapes-model}
+\end{figure}
 
 
-% use section* for acknowledgment
+
 \ifCLASSOPTIONcompsoc
-  % The Computer Society usually uses the plural form
-  \section*{Acknowledgments}
+    \section*{Acknowledgments}
 \else
-  % regular IEEE prefers the singular form
-  \section*{Acknowledgment}
+    \section*{Acknowledgment}
 \fi
-
 
 The authors would like to thank...
 
@@ -644,13 +687,17 @@ The authors would like to thank...
 % <OR> manually copy in the resultant .bbl file
 % set second argument of \begin to the number of references
 % (used to reserve space for the reference number labels box)
-\begin{thebibliography}{1}
 
-\bibitem{IEEEhowto:kopka}
-H.~Kopka and P.~W. Daly, \emph{A Guide to {\LaTeX}}, 3rd~ed.\hskip 1em plus
-  0.5em minus 0.4em\relax Harlow, England: Addison-Wesley, 1999.
+% \begin{thebibliography}{1}
 
-\end{thebibliography}
+% \bibitem{IEEEhowto:kopka}
+% H.~Kopka and P.~W. Daly, \emph{A Guide to {\LaTeX}}, 3rd~ed.\hskip 1em plus
+%   0.5em minus 0.4em\relax Harlow, England: Addison-Wesley, 1999.
+
+% \end{thebibliography}
+
+\bibliographystyle{IEEEtran}
+\bibliography{bibliography}
 
 % biography section
 % 
