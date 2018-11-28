@@ -372,8 +372,7 @@ pdfkeywords={Semantic Segmentation, Deep Learning, Pixel-wise Segmentation}}%<^!
         Dr.~S.P.~Mishra,~DTRL,~DRDO}
 
 
-
-\markboth{Journal of \LaTeX\ Class Files,~Vol.~14, No.~8, August~2015}%
+\markboth{Defence Terrain Research Laboratory, DRDO}%
 {Semantic Segmentation}
 % The only time the second header will appear is for the odd numbered pages
 % after the title page when using the twoside option.
@@ -382,7 +381,11 @@ pdfkeywords={Semantic Segmentation, Deep Learning, Pixel-wise Segmentation}}%<^!
 
 \IEEEtitleabstractindextext{%
 \begin{abstract}
-The abstract goes here.
+Convolutional networks due to their translation invariance, serve as powerful 
+tools to detect key features from an image. This work shows the creation of a 
+neural network using FCN + Deconvolution + Skip Connections. The network 
+consisting of only convolution type layers can be both trained and evaluated 
+using images of arbitrary size.
 \end{abstract}
 
 \begin{IEEEkeywords}
@@ -404,9 +407,6 @@ The abstract goes here.
 \label{sec:introduction}
 \fi
 
-
-
-
 % The very first letter is a 2 line initial drop letter followed
 % by the rest of the first word in caps (small caps for compsoc).
 % 
@@ -417,11 +417,26 @@ The abstract goes here.
 % normal text (unknown if ever used by the IEEE):
 % \IEEEPARstart{A}{}demo file is ....
 
-\IEEEPARstart{T}{his} 
+\IEEEPARstart{T}{he} introduction of Convolutional networks has revolutionized 
+the field of machine learning. They have shown applications not only in image-based 
+tasks but also in other problems such as Natural Language Processing. 
+They serve as the state-of-art for almost all image-based problems.
+
+Fully Convolutional Networks, are an excellent way to extract prominent features 
+from an image and are also fast. In order to maintain their speed, they use 
+pooling layers at intervals to decrease image resolution. But, this also limits 
+the networks' ability to resize the image back, as a great deal of information 
+gets lost in the process. Hence, the output from an FCN needs to be upscaled 
+using techniques such as Bilinear Upscaling. In this work, we use an advanced 
+way of upscaling called Deconvolution. Deconvolutions are reverse convolutions 
+and increase the size of the image. Like convolutions, they can be trained too. 
+
+This work uses FCNs and Deconvolution networks to decompose image scenes into 
+separate meaningful identities. This task is also known as Semantic Segmentation.
 
 \subsection{Semantic Segmentation}
-Semantic means "meaning in language or logic", and when we talk about 
-semnatically segmenting an image we mean to divide the image in to meaningful
+Semantic refers to "meaning in language or logic", and when we talk about 
+semantically segmenting an image we mean to divide the image into meaningful 
 parts, such as physical objects.
 
 \begin{figure}[!h]
@@ -430,26 +445,32 @@ parts, such as physical objects.
     \label{fig:semantic_segmentation}
 \end{figure}
 
-For example, the Figure~\ref{fig:semantic_segmentation} has been segmented 
+For example, Fig.~\ref{fig:semantic_segmentation} has been segmented 
 into 4 different categories (Cat, Table, Chair, and Background). As it might 
 be evident, this task is not achievable using unsupervised methods. We need to 
-define the desired segmentation categories, as an image with infinte detail 
+define the desired segmentation categories, as an image with infinite detail 
 could be segmented into an infinite number of categories.
 
 
 
-\section{}
+\section{Network Architectures}
 
 \subsection{Fully Convolutional Networks}
-Fully Convolutional Networks (FCNs) are what one gets on building a neural 
-network using only convolutional-type layers. They keep the spatial information 
-of an image intact.
+Fully Convolutional Networks (FCNs) (Fig.~\ref{fig:fully-convolutional-network}) 
+are what one gets on building a neural network using only convolutional-type 
+layers. They keep the spatial information of an image intact.
 
 \begin{figure}[!h]
     \includegraphics[width=\linewidth]{fcn.png}
-    \caption{Representation of a FCN (Source: J. Long et al, 2015\cite{long2015fully})}
+    \caption{Representation of an FCN (Source: J. Long et al, 2015\cite{long2015fully})}
     \label{fig:fully-convolutional-network}
 \end{figure}
+
+In the training process, they learn to highlight the key features describing a 
+class in the image. With increasing network depth, receptive fields of the 
+convolution layers also increase. Starting layers learn to recognize simple 
+features such as a straight line, and curves, while the later layers might be 
+learning geometries as complex as a face.
 
 
 \subsection{Deconvolution Networks}
@@ -473,7 +494,7 @@ The Cityscapes dataset\cite{Cordts2016Cityscapes} offers pixel-wise segmented
 images from stereo videos recorded in street scenes from 50 different cities. 
 It contains 5,000 fine quality and a larger set of 20,000 weakly annotated 
 images. The images have a resolution of 2048 x 1024 pixels. For our purpose, 
-we use the set of finely annotated images from the left cam-era.
+we use the set of finely annotated images from the left camera.
 
 \begin{figure}[!h]
   \includegraphics[width=\linewidth]{zuerich.png}
@@ -495,8 +516,12 @@ as a testing dataset to check for convergence of our models.
 
 \section{Segmentation Architecture}
 
-We use a hybrid architecture of a Fully Convolutional Network, a 
-Deconvolution Network, and skip connections.
+We use a hybrid architecture of a Fully Convolutional Network, a Deconvolution 
+Network, and skip connections.
+
+The training images and the corresponding segmentation labels are downsampled 
+from 2048 x 1024 pixels to 512 x 256 pixels. This step was necessary to keep 
+the size of the compiled model in control.
 
 
 \subsection{Skip Connections}
@@ -510,13 +535,24 @@ in keeping the effect of gradients intact during backpropagation.
 
 When using pooling layers, information gets lost at each step. This limits the
 network's ability to resize the image back to its original size. Skip 
-connections help pass the high resolution information to later layers.
+connections help pass the high-resolution information to later layers.
 
 
 \subsection{Architecture}
+The complete architecture can be found in the Appendix.
 
+The network consists of 5 Convolution + Pooling layers, in the beginning, 
+starting with a filter size of 128 and going up to 512. Convolution layers act 
+as feature extractors. They detect key semantic features for each class. This 
+process downscales the image too.
 
+After training, the output of the last convolution layer represents a map of the 
+detect features. This FCN is succeeded by a Deconvolution network, which upscales 
+the image back to its original size.
 
+The entire network consists of 3 skip connections, from the MaxPooling layers 
+to Deconvolution layers of corresponding dimensions. These connections greatly 
+increase accuracy.
 
 % An example of a floating figure using the graphicx package.
 % Note that \label must occur AFTER (or within) \caption.
@@ -618,9 +654,31 @@ connections help pass the high resolution information to later layers.
 
 \section{Results}
 
+The trained model achieved a Mean IoU (Intersection over Union) accuracy of 
+78.6\%, over the test data.
+
+It was found that despite reducing the training image resolution by a factor 
+of 16, the trained model was able to make good predictions even on larger images.
+
+\begin{figure}[!h]
+  \includegraphics[width=\linewidth]{cityscapes-results.png}
+  \caption{Cityscapes Dataset - Results (FCN + Deconvolution + Skip Connections)}
+  \label{fig:cityscapes_results}
+\end{figure}
 
 
+\section{Conclusion}
 
+
+The network in this work can be further improved with the use of Conditional 
+Random Field layers, which we plan to present in a future work.
+
+The model was also tested with road scene images other than the dataset, and the 
+results showed that the network was able to detect the classes properly, though 
+the segmentation maps were not as good.
+
+A shortcoming of the model was that it was not very good at predicting humans, 
+and the segmentation map was jagged in most of the cases.
 
 % if have a single appendix:
 %\appendix[Proof of the Zonklar Equations]
@@ -638,10 +696,11 @@ connections help pass the high resolution information to later layers.
 \clearpage
 
 \appendices
-\section{Model Architecture - Cityscapes Dataset}
+\section{Model Architecture Visualisation - FCN + Deconvolution + Skip 
+        Connections - Cityscapes Dataset}
 
 \begin{figure}[!hp]
-    \includegraphics[height=0.9\textheight]{cityscapes-model.png}
+    \includegraphics[height=0.85\textheight]{cityscapes-model.png}
     \caption{Model Architecture - Cityscapes Dataset}
     \label{fig:cityscapes-model}
 \end{figure}
@@ -654,7 +713,8 @@ connections help pass the high resolution information to later layers.
     \section*{Acknowledgment}
 \fi
 
-The authors would like to thank...
+We would like to thank you Defence Terrain Research Laboratory, DRDO, Delhi 
+for providing us with the opportunity to work on the project.
 
 
 % Can use something like this to put references on a page
@@ -710,22 +770,19 @@ The authors would like to thank...
 %\begin{IEEEbiography}[{\includegraphics[width=1in,height=1.25in,clip,keepaspectratio]{mshell}}]{Michael Shell}
 % or if you just want to reserve a space for a photo:
 
-\begin{IEEEbiography}{Michael Shell}
-Biography text here.
-\end{IEEEbiography}
+% \begin{IEEEbiography}{Michael Shell}
+% Biography text here.
+% \end{IEEEbiography}
 
-% if you will not have a photo at all:
-\begin{IEEEbiographynophoto}{John Doe}
-Biography text here.
-\end{IEEEbiographynophoto}
+% % if you will not have a photo at all:
+% \begin{IEEEbiographynophoto}{John Doe}
+% Biography text here.
+% \end{IEEEbiographynophoto}
 
 % insert where needed to balance the two columns on the last page with
 % biographies
 %\newpage
 
-\begin{IEEEbiographynophoto}{Jane Doe}
-Biography text here.
-\end{IEEEbiographynophoto}
 
 % You can push biographies down or up by placing
 % a \vfill before or after them. The appropriate
